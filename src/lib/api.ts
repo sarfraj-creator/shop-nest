@@ -1,48 +1,73 @@
 import { Product } from "@/types";
 
-// Why we proxy through /api routes:
-// Vercel's server components can't reliably reach external APIs (fakestoreapi.com)
-// due to cold starts, network restrictions, or the API blocking Vercel IPs.
-// By routing through our own /api handlers, the fetch happens on the same
-// infrastructure and is always reliable.
+// Using DummyJSON — much more reliable than FakeStoreAPI on cloud platforms like Vercel.
+// DummyJSON has the same product data (electronics, clothing, etc.) and never blocks
+// server-side fetches from Vercel, Netlify, or any other platform.
+const API = "https://dummyjson.com";
 
-function getBaseUrl(): string {
-  // Running in the browser — relative URLs work fine
-  if (typeof window !== "undefined") return "";
+// DummyJSON product shape differs slightly from our internal Product type.
+// We normalise it here so the rest of the app never needs to know about DummyJSON.
+interface DummyProduct {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  rating: number;
+  stock: number;
+  brand?: string;
+  category: string;
+  thumbnail: string;
+  images: string[];
+  discountPercentage?: number;
+}
 
-  // Vercel production — VERCEL_URL is auto-set to the deployment URL
-  // e.g. "shop-nest-frui.vercel.app"
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
+interface DummyProductsResponse {
+  products: DummyProduct[];
+  total: number;
+  skip: number;
+  limit: number;
+}
 
-  // Vercel preview deployments use NEXT_PUBLIC_VERCEL_URL
-  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
-  }
-
-  // Local development
-  return "http://localhost:3000";
+function normalise(p: DummyProduct): Product {
+  return {
+    id: p.id,
+    title: p.title,
+    description: p.description,
+    price: p.price,
+    category: p.category,
+    image: p.thumbnail,          // DummyJSON uses 'thumbnail', we use 'image'
+    rating: {
+      rate: p.rating,            // DummyJSON rating is a plain number
+      count: p.stock,            // use stock as the review count proxy
+    },
+    brand: p.brand,
+    stock: p.stock,
+    discountPercentage: p.discountPercentage,
+    images: p.images,
+  };
 }
 
 export async function fetchProducts(): Promise<Product[]> {
-  const res = await fetch(`${getBaseUrl()}/api/products`, {
+  const res = await fetch(`${API}/products?limit=100&skip=0`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(`fetchProducts failed: ${res.status}`);
-  return res.json();
+  const data: DummyProductsResponse = await res.json();
+  return data.products.map(normalise);
 }
 
 export async function fetchProduct(id: number): Promise<Product> {
-  const res = await fetch(`${getBaseUrl()}/api/products/${id}`, {
+  const res = await fetch(`${API}/products/${id}`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(`fetchProduct failed: ${res.status}`);
-  return res.json();
+  const data: DummyProduct = await res.json();
+  return normalise(data);
 }
 
 export async function fetchCategories(): Promise<string[]> {
-  const res = await fetch(`${getBaseUrl()}/api/categories`, {
+  // DummyJSON /products/category-list returns a plain string array
+  const res = await fetch(`${API}/products/category-list`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(`fetchCategories failed: ${res.status}`);
@@ -53,10 +78,11 @@ export async function fetchProductsByCategory(
   category: string
 ): Promise<Product[]> {
   const res = await fetch(
-    `${getBaseUrl()}/api/products/category/${encodeURIComponent(category)}`,
+    `${API}/products/category/${encodeURIComponent(category)}?limit=100`,
     { cache: "no-store" }
   );
   if (!res.ok)
     throw new Error(`fetchProductsByCategory failed: ${res.status}`);
-  return res.json();
+  const data: DummyProductsResponse = await res.json();
+  return data.products.map(normalise);
 }

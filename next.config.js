@@ -4,16 +4,25 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "cdn.dummyjson.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        // Some DummyJSON images come from i.dummyjson.com
+        protocol: "https",
+        hostname: "i.dummyjson.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        // Keep fakestoreapi in case any old images are referenced
+        protocol: "https",
         hostname: "fakestoreapi.com",
         port: "",
         pathname: "/**",
       },
     ],
-  },
-  // Ensure all server components use Node.js runtime (not edge)
-  // Edge runtime has restrictions on fetch, timeouts, and external APIs
-  experimental: {
-    serverComponentsExternalPackages: [],
   },
 };
 

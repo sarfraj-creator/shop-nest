@@ -11,36 +11,25 @@ A full-featured e-commerce web app built with Next.js 14, TypeScript, Tailwind C
 **Requirements:** Node.js 18+ and npm
 
 ```bash
-# 1. Unzip the project and go into the folder
+# 1. Go into the project folder
 cd ecommerce-app
 
-# 2. Install all dependencies
+# 2. Install dependencies
 npm install
 
-# 3. Start the development server
+# 3. Start the dev server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000)
 
-> No `.env` file needed. The app uses the free public Fake Store API — no API keys required.
-
----
-
-## How to Build for Production
-
-```bash
-npm run build    # Creates optimised production build
-npm start        # Runs the production build locally
-```
+> No `.env` file needed. Uses the free DummyJSON API — no API keys required.
 
 ---
 
-## Git Commands (Push to GitHub)
+## Git Commands
 
 ```bash
-# Inside the ecommerce-app folder:
-
 git init
 git add .
 git commit -m "feat: initial shopnest ecommerce app"
@@ -49,7 +38,15 @@ git remote add origin https://github.com/YOUR_USERNAME/shopnest.git
 git push -u origin main
 ```
 
-After pushing — import the repo on [vercel.com/new](https://vercel.com/new) and click **Deploy**. No config needed.
+---
+
+## Deploy to Vercel
+
+1. Push to GitHub (commands above)
+2. Go to [vercel.com/new](https://vercel.com/new) → Import repo
+3. Leave all settings as default
+4. **No environment variables needed**
+5. Click **Deploy**
 
 ---
 
@@ -58,12 +55,12 @@ After pushing — import the repo on [vercel.com/new](https://vercel.com/new) an
 | Tool | Purpose |
 |---|---|
 | Next.js 14 (App Router) | Framework — SSR + dynamic rendering |
-| TypeScript | Full type safety across all files |
-| Tailwind CSS | Utility-first CSS styling |
-| Zustand + persist | Cart & Wishlist state, persisted to localStorage |
+| TypeScript | Full type safety |
+| Tailwind CSS | Utility-first styling |
+| Zustand + persist | Cart & Wishlist state with localStorage |
 | react-hot-toast | Toast notifications |
 | react-icons | Icon library |
-| Fake Store API | Free public product data source |
+| DummyJSON API | Free, reliable product data (no API key needed) |
 
 ---
 
@@ -71,14 +68,14 @@ After pushing — import the repo on [vercel.com/new](https://vercel.com/new) an
 
 | Feature | Details |
 |---|---|
-| Product Listing | Browse all products with category filter + live search |
-| Product Detail | Full product info, star rating, add to cart & wishlist |
-| Shopping Cart | Add, remove, update quantity, free shipping over $50, localStorage persisted |
+| Product Listing | Browse with category filter + live search |
+| Product Detail | Full info, ratings, add to cart & wishlist |
+| Shopping Cart | Add, remove, update qty, free shipping over $50, localStorage persisted |
 | Wishlist | Toggle save, move to cart, localStorage persisted |
-| Checkout | Form with full validation (name, email, address) + order summary |
-| Order Success | Confirmation page after placing order |
-| Error Handling | Loading skeletons, empty states, error boundary, 404 page |
-| Responsive | Works on mobile, tablet, and desktop |
+| Checkout | Form validation, order summary sidebar |
+| Order Success | Confirmation page |
+| Error Handling | Skeletons, empty states, error boundary, 404 page |
+| Responsive | Mobile, tablet, desktop |
 
 ---
 
@@ -87,85 +84,60 @@ After pushing — import the repo on [vercel.com/new](https://vercel.com/new) an
 ```
 src/
 ├── app/
-│   ├── layout.tsx                  # Root layout — Navbar, Footer, Toaster
-│   ├── page.tsx                    # Homepage — hero, perks, featured products
-│   ├── not-found.tsx               # 404 page
+│   ├── layout.tsx
+│   ├── page.tsx                  # Homepage (SSR)
+│   ├── not-found.tsx
 │   ├── products/
-│   │   ├── page.tsx                # Product listing (search + category filter)
-│   │   ├── loading.tsx             # Skeleton loading state
-│   │   ├── error.tsx               # Error boundary
+│   │   ├── page.tsx              # Product listing (client — search/filter)
+│   │   ├── loading.tsx
+│   │   ├── error.tsx
 │   │   └── [id]/
-│   │       ├── page.tsx            # Product detail page (dynamic SSR)
-│   │       └── ProductActions.tsx  # Client — add to cart / wishlist buttons
-│   ├── cart/
-│   │   └── page.tsx                # Cart page
-│   ├── wishlist/
-│   │   └── page.tsx                # Wishlist page
-│   ├── checkout/
-│   │   └── page.tsx                # Checkout page
-│   └── order-success/
-│       └── page.tsx                # Order confirmation page
-│
+│   │       ├── page.tsx          # Product detail (SSR)
+│   │       └── ProductActions.tsx
+│   ├── cart/page.tsx
+│   ├── wishlist/page.tsx
+│   ├── checkout/page.tsx
+│   └── order-success/page.tsx
 ├── components/
-│   ├── layout/
-│   │   ├── Navbar.tsx              # Sticky navbar with cart + wishlist badge counts
-│   │   └── Footer.tsx
-│   ├── product/
-│   │   ├── ProductCard.tsx         # Product card with wishlist toggle + add to cart
-│   │   ├── ProductGrid.tsx         # Grid wrapper with skeleton + empty state
-│   │   └── CategoryFilter.tsx      # Category pill filter buttons
-│   ├── cart/
-│   │   ├── CartItemRow.tsx         # Cart row — image, qty controls, remove
-│   │   └── CartSummary.tsx         # Order summary — subtotal, shipping, total
-│   ├── checkout/
-│   │   └── CheckoutForm.tsx        # Checkout form with validation
-│   ├── wishlist/
-│   │   └── WishlistCard.tsx        # Wishlist item with move-to-cart
-│   └── ui/
-│       ├── button.tsx
-│       ├── badge.tsx
-│       ├── input.tsx
-│       ├── label.tsx
-│       ├── skeleton.tsx
-│       └── star-rating.tsx
-│
+│   ├── layout/                   # Navbar, Footer
+│   ├── product/                  # ProductCard, ProductGrid, CategoryFilter
+│   ├── cart/                     # CartItemRow, CartSummary
+│   ├── checkout/                 # CheckoutForm
+│   ├── wishlist/                 # WishlistCard
+│   └── ui/                       # Button, Badge, Input, Label, Skeleton, StarRating
 ├── hooks/
-│   └── useHydration.ts             # Prevents SSR/localStorage hydration mismatch
-│
+│   └── useHydration.ts
 ├── store/
-│   ├── cartStore.ts                # Zustand cart store (persisted to localStorage)
-│   └── wishlistStore.ts            # Zustand wishlist store (persisted to localStorage)
-│
+│   ├── cartStore.ts
+│   └── wishlistStore.ts
 ├── lib/
-│   ├── api.ts                      # All Fake Store API fetch functions
-│   └── utils.ts                    # cn(), formatPrice(), truncate()
-│
-└── types/
-    └── index.ts                    # TypeScript interfaces: Product, CartItem, etc.
+│   ├── api.ts                    # DummyJSON API functions
+│   └── utils.ts
+└── types/index.ts
 ```
 
 ---
 
 ## API Reference
 
-**Base URL:** `https://fakestoreapi.com`
+**Base URL:** `https://dummyjson.com`
 
 | Endpoint | Used For |
 |---|---|
-| `GET /products` | Fetch all products (homepage + listing page) |
-| `GET /products/:id` | Fetch single product for detail page |
-| `GET /products/categories` | Fetch category list for filter |
-| `GET /products/category/:name` | Fetch products filtered by category |
+| `GET /products?limit=100` | All products |
+| `GET /products/:id` | Single product detail |
+| `GET /products/category-list` | All category names |
+| `GET /products/category/:name` | Products by category |
 
-No authentication. No API key. Completely free.
+No authentication. No rate limits. Works on all cloud platforms.
 
 ---
 
-## Available Scripts
+## Scripts
 
 ```bash
-npm run dev      # Start dev server at http://localhost:3000
-npm run build    # Build for production
-npm start        # Start production server
-npm run lint     # Run ESLint checks
+npm run dev      # Dev server at http://localhost:3000
+npm run build    # Production build
+npm start        # Run production build
+npm run lint     # ESLint check
 ```

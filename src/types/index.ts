@@ -4,11 +4,16 @@ export interface Product {
   price: number;
   description: string;
   category: string;
-  image: string;
+  image: string;       // mapped from thumbnail in DummyJSON
   rating: {
-    rate: number;
-    count: number;
+    rate: number;      // mapped from rating (number) in DummyJSON
+    count: number;     // mapped from stock in DummyJSON
   };
+  // Extra fields from DummyJSON (available if needed)
+  brand?: string;
+  stock?: number;
+  discountPercentage?: number;
+  images?: string[];
 }
 
 export interface CartItem extends Product {
