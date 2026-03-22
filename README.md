@@ -1,23 +1,42 @@
-# ShopNest — Next.js E-Commerce App
+# ShopNest
 
-A full-featured e-commerce web application built with Next.js 14, TypeScript, Tailwind CSS, and Zustand.
+A full-featured e-commerce web app built with Next.js 14, TypeScript, Tailwind CSS, and Zustand.
+
+**Live Demo:** [https://shop-nest-frui.vercel.app](https://shop-nest-frui.vercel.app)
 
 ---
 
-## Quick Start (Local)
+## How to Run Locally
+
+**Requirements:** Node.js 18+ and npm
 
 ```bash
+# 1. Unzip the project and go into the folder
+cd ecommerce-app
+
+# 2. Install all dependencies
 npm install
+
+# 3. Start the development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+> No `.env` file needed. The app uses the free public Fake Store API — no API keys required.
 
 ---
 
-## Deploy to Vercel
+## How to Build for Production
 
-### Step 1 — Push to GitHub
+```bash
+npm run build    # Creates optimised production build
+npm start        # Runs the production build locally
+```
+
+---
+
+## Git Commands (Push to GitHub)
 
 ```bash
 # Inside the ecommerce-app folder:
@@ -30,32 +49,7 @@ git remote add origin https://github.com/YOUR_USERNAME/shopnest.git
 git push -u origin main
 ```
 
-### Step 2 — Deploy on Vercel
-
-1. Go to [vercel.com/new](https://vercel.com/new)
-2. Click **Import** next to your `shopnest` repo
-3. Leave all settings as default — Vercel auto-detects Next.js
-4. **No environment variables needed** — leave that section empty
-5. Click **Deploy**
-
----
-
-## Vercel Settings (leave all as default)
-
-| Setting | Value |
-|---|---|
-| Framework Preset | Next.js (auto-detected) |
-| Root Directory | `./` |
-| Build Command | `next build` (default) |
-| Output Directory | Next.js default |
-| Install Command | `npm install` (default) |
-| Environment Variables | **None required** |
-
----
-
-## Environment Variables
-
-**None needed.** This project uses [Fake Store API](https://fakestoreapi.com) — completely free and public, no API key required.
+After pushing — import the repo on [vercel.com/new](https://vercel.com/new) and click **Deploy**. No config needed.
 
 ---
 
@@ -63,27 +57,28 @@ git push -u origin main
 
 | Tool | Purpose |
 |---|---|
-| Next.js 14 (App Router) | Framework |
-| TypeScript | Type safety |
-| Tailwind CSS | Styling |
-| Zustand + persist | Cart & Wishlist state (localStorage) |
+| Next.js 14 (App Router) | Framework — SSR + dynamic rendering |
+| TypeScript | Full type safety across all files |
+| Tailwind CSS | Utility-first CSS styling |
+| Zustand + persist | Cart & Wishlist state, persisted to localStorage |
 | react-hot-toast | Toast notifications |
-| react-icons | Icons |
-| Fake Store API | Product data |
+| react-icons | Icon library |
+| Fake Store API | Free public product data source |
 
 ---
 
 ## Features
 
-- Product listing with category filter + search
-- Product detail page (SSG pre-built at deploy time)
-- Shopping cart — add, remove, update qty, free shipping over $50
-- Wishlist — toggle, move to cart
-- Checkout form with validation
-- Order success confirmation
-- Full localStorage persistence for cart and wishlist
-- Loading skeletons, error states, empty states, 404 page
-- Fully responsive (mobile, tablet, desktop)
+| Feature | Details |
+|---|---|
+| Product Listing | Browse all products with category filter + live search |
+| Product Detail | Full product info, star rating, add to cart & wishlist |
+| Shopping Cart | Add, remove, update quantity, free shipping over $50, localStorage persisted |
+| Wishlist | Toggle save, move to cart, localStorage persisted |
+| Checkout | Form with full validation (name, email, address) + order summary |
+| Order Success | Confirmation page after placing order |
+| Error Handling | Loading skeletons, empty states, error boundary, 404 page |
+| Responsive | Works on mobile, tablet, and desktop |
 
 ---
 
@@ -92,60 +87,85 @@ git push -u origin main
 ```
 src/
 ├── app/
-│   ├── layout.tsx
-│   ├── page.tsx                  # Homepage
-│   ├── not-found.tsx
+│   ├── layout.tsx                  # Root layout — Navbar, Footer, Toaster
+│   ├── page.tsx                    # Homepage — hero, perks, featured products
+│   ├── not-found.tsx               # 404 page
 │   ├── products/
-│   │   ├── page.tsx              # Product listing
-│   │   ├── loading.tsx
-│   │   ├── error.tsx
+│   │   ├── page.tsx                # Product listing (search + category filter)
+│   │   ├── loading.tsx             # Skeleton loading state
+│   │   ├── error.tsx               # Error boundary
 │   │   └── [id]/
-│   │       ├── page.tsx          # Product detail (SSG)
-│   │       └── ProductActions.tsx
-│   ├── cart/page.tsx
-│   ├── wishlist/page.tsx
-│   ├── checkout/page.tsx
-│   └── order-success/page.tsx
+│   │       ├── page.tsx            # Product detail page (dynamic SSR)
+│   │       └── ProductActions.tsx  # Client — add to cart / wishlist buttons
+│   ├── cart/
+│   │   └── page.tsx                # Cart page
+│   ├── wishlist/
+│   │   └── page.tsx                # Wishlist page
+│   ├── checkout/
+│   │   └── page.tsx                # Checkout page
+│   └── order-success/
+│       └── page.tsx                # Order confirmation page
+│
 ├── components/
-│   ├── layout/                   # Navbar, Footer
-│   ├── product/                  # ProductCard, ProductGrid, CategoryFilter
-│   ├── cart/                     # CartItemRow, CartSummary
-│   ├── checkout/                 # CheckoutForm
-│   ├── wishlist/                 # WishlistCard
-│   └── ui/                       # Button, Badge, Input, Label, Skeleton, StarRating
+│   ├── layout/
+│   │   ├── Navbar.tsx              # Sticky navbar with cart + wishlist badge counts
+│   │   └── Footer.tsx
+│   ├── product/
+│   │   ├── ProductCard.tsx         # Product card with wishlist toggle + add to cart
+│   │   ├── ProductGrid.tsx         # Grid wrapper with skeleton + empty state
+│   │   └── CategoryFilter.tsx      # Category pill filter buttons
+│   ├── cart/
+│   │   ├── CartItemRow.tsx         # Cart row — image, qty controls, remove
+│   │   └── CartSummary.tsx         # Order summary — subtotal, shipping, total
+│   ├── checkout/
+│   │   └── CheckoutForm.tsx        # Checkout form with validation
+│   ├── wishlist/
+│   │   └── WishlistCard.tsx        # Wishlist item with move-to-cart
+│   └── ui/
+│       ├── button.tsx
+│       ├── badge.tsx
+│       ├── input.tsx
+│       ├── label.tsx
+│       ├── skeleton.tsx
+│       └── star-rating.tsx
+│
 ├── hooks/
-│   └── useHydration.ts           # Fixes SSR/localStorage hydration mismatch
+│   └── useHydration.ts             # Prevents SSR/localStorage hydration mismatch
+│
 ├── store/
-│   ├── cartStore.ts              # Zustand cart (persisted to localStorage)
-│   └── wishlistStore.ts          # Zustand wishlist (persisted to localStorage)
+│   ├── cartStore.ts                # Zustand cart store (persisted to localStorage)
+│   └── wishlistStore.ts            # Zustand wishlist store (persisted to localStorage)
+│
 ├── lib/
-│   ├── api.ts                    # Fake Store API fetch functions
-│   └── utils.ts                  # cn(), formatPrice(), truncate()
-└── types/index.ts
+│   ├── api.ts                      # All Fake Store API fetch functions
+│   └── utils.ts                    # cn(), formatPrice(), truncate()
+│
+└── types/
+    └── index.ts                    # TypeScript interfaces: Product, CartItem, etc.
 ```
 
 ---
 
-## API
+## API Reference
 
 **Base URL:** `https://fakestoreapi.com`
 
 | Endpoint | Used For |
 |---|---|
-| `GET /products` | All products |
-| `GET /products/:id` | Single product detail |
-| `GET /products/categories` | Category list for filter |
-| `GET /products/category/:name` | Products by category |
+| `GET /products` | Fetch all products (homepage + listing page) |
+| `GET /products/:id` | Fetch single product for detail page |
+| `GET /products/categories` | Fetch category list for filter |
+| `GET /products/category/:name` | Fetch products filtered by category |
 
-No authentication or API key required.
+No authentication. No API key. Completely free.
 
 ---
 
-## Scripts
+## Available Scripts
 
 ```bash
-npm run dev      # Start development server
-npm run build    # Production build
+npm run dev      # Start dev server at http://localhost:3000
+npm run build    # Build for production
 npm start        # Start production server
-npm run lint     # Run ESLint
+npm run lint     # Run ESLint checks
 ```

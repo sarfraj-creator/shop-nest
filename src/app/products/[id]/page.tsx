@@ -2,28 +2,18 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { FiArrowLeft } from "react-icons/fi";
-import { fetchProduct, fetchProducts } from "@/lib/api";
+import { fetchProduct } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { StarRating } from "@/components/ui/star-rating";
 import { formatPrice } from "@/lib/utils";
 import { ProductActions } from "./ProductActions";
 
+// Force dynamic so every request hits the live API — no SSG
+// This avoids the build-time fetch failure causing 404s on Vercel
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: { id: string };
-}
-
-// Tell Next.js to allow dynamic params not in the static list (SSR fallback)
-export const dynamicParams = true;
-
-// Pre-build all product pages at deploy time
-export async function generateStaticParams() {
-  try {
-    const products = await fetchProducts();
-    return products.map((p) => ({ id: String(p.id) }));
-  } catch {
-    // If API is down at build time, fall back to dynamic rendering
-    return [];
-  }
 }
 
 export async function generateMetadata({ params }: Props) {
@@ -41,7 +31,6 @@ export async function generateMetadata({ params }: Props) {
 export default async function ProductDetailPage({ params }: Props) {
   const id = Number(params.id);
 
-  // Validate id is actually a number before fetching
   if (isNaN(id) || id <= 0) {
     notFound();
   }
@@ -115,7 +104,7 @@ export default async function ProductDetailPage({ params }: Props) {
             </Badge>
           </div>
 
-          {/* Client-side add to cart / wishlist */}
+          {/* Client buttons */}
           <ProductActions product={product} />
 
           {/* Trust signals */}

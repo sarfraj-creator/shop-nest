@@ -4,6 +4,9 @@ import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import { FiArrowRight, FiShield, FiTruck, FiRefreshCw } from "react-icons/fi";
 
+// Force dynamic so homepage always shows fresh products from the API
+export const dynamic = "force-dynamic";
+
 async function getFeaturedProducts() {
   try {
     const products = await fetchProducts();
@@ -118,7 +121,7 @@ export default async function HomePage() {
         ) : (
           <div className="flex h-48 items-center justify-center rounded-xl border border-dashed border-slate-200">
             <p className="text-sm text-slate-400">
-              Products could not be loaded. Please try again later.
+              Unable to load products. Please refresh the page.
             </p>
           </div>
         )}
