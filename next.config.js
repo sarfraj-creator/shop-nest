@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    // remotePatterns is the correct way in Next.js 13+ (domains is deprecated)
     remotePatterns: [
       {
         protocol: "https",
@@ -11,8 +10,11 @@ const nextConfig = {
       },
     ],
   },
-  // Vercel handles this automatically but being explicit is cleaner
-  // No env variables needed — this app uses only public free APIs
+  // Ensure all server components use Node.js runtime (not edge)
+  // Edge runtime has restrictions on fetch, timeouts, and external APIs
+  experimental: {
+    serverComponentsExternalPackages: [],
+  },
 };
 
 module.exports = nextConfig;

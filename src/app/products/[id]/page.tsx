@@ -8,9 +8,11 @@ import { StarRating } from "@/components/ui/star-rating";
 import { formatPrice } from "@/lib/utils";
 import { ProductActions } from "./ProductActions";
 
-// Force dynamic so every request hits the live API — no SSG
-// This avoids the build-time fetch failure causing 404s on Vercel
+// Pure SSR — fetch fresh from API on every single request
+// No static generation, no build-time fetching, no edge runtime
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+export const fetchCache = "force-no-store";
 
 interface Props {
   params: { id: string };
@@ -31,15 +33,36 @@ export async function generateMetadata({ params }: Props) {
 export default async function ProductDetailPage({ params }: Props) {
   const id = Number(params.id);
 
-  if (isNaN(id) || id <= 0) {
+  // Validate the id param first
+  if (!params.id || isNaN(id) || id <= 0) {
     notFound();
   }
 
   let product;
   try {
     product = await fetchProduct(id);
-  } catch {
-    notFound();
+  } catch (err) {
+    // API failed — show a friendly error instead of a generic 404
+    // This distinguishes "product doesn't exist" from "API is down"
+    console.error("Failed to fetch product:", err);
+    return (
+      <div className="mx-auto flex max-w-md flex-col items-center justify-center gap-4 px-4 py-32 text-center">
+        <div className="text-5xl">😕</div>
+        <h1 className="text-xl font-bold text-slate-900">
+          Could not load product
+        </h1>
+        <p className="text-sm text-slate-500">
+          We had trouble fetching this product. Please try again.
+        </p>
+        <Link
+          href="/products"
+          className="mt-2 inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+        >
+          <FiArrowLeft className="h-4 w-4" />
+          Back to Products
+        </Link>
+      </div>
+    );
   }
 
   return (
@@ -104,7 +127,7 @@ export default async function ProductDetailPage({ params }: Props) {
             </Badge>
           </div>
 
-          {/* Client buttons */}
+          {/* Client-side cart / wishlist buttons */}
           <ProductActions product={product} />
 
           {/* Trust signals */}

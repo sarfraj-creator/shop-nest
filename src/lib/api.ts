@@ -1,39 +1,47 @@
 import { Product } from "@/types";
 
 const API = "https://fakestoreapi.com";
+const TIMEOUT_MS = 8000; // 8 second timeout
+
+// Helper that wraps fetch with a timeout so Vercel doesn't hang forever
+async function fetchWithTimeout(url: string): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  try {
+    const res = await fetch(url, {
+      cache: "no-store",
+      signal: controller.signal,
+    });
+    return res;
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 export async function fetchProducts(): Promise<Product[]> {
-  const res = await fetch(`${API}/products`, {
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error(`Failed to fetch products: ${res.status}`);
+  const res = await fetchWithTimeout(`${API}/products`);
+  if (!res.ok) throw new Error(`fetchProducts failed: ${res.status}`);
   return res.json();
 }
 
 export async function fetchProduct(id: number): Promise<Product> {
-  const res = await fetch(`${API}/products/${id}`, {
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error(`Product not found: ${res.status}`);
+  const res = await fetchWithTimeout(`${API}/products/${id}`);
+  if (!res.ok) throw new Error(`fetchProduct failed: ${res.status}`);
   return res.json();
 }
 
 export async function fetchCategories(): Promise<string[]> {
-  const res = await fetch(`${API}/products/categories`, {
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error(`Failed to fetch categories: ${res.status}`);
+  const res = await fetchWithTimeout(`${API}/products/categories`);
+  if (!res.ok) throw new Error(`fetchCategories failed: ${res.status}`);
   return res.json();
 }
 
 export async function fetchProductsByCategory(
   category: string
 ): Promise<Product[]> {
-  const res = await fetch(
-    `${API}/products/category/${encodeURIComponent(category)}`,
-    { cache: "no-store" }
+  const res = await fetchWithTimeout(
+    `${API}/products/category/${encodeURIComponent(category)}`
   );
-  if (!res.ok)
-    throw new Error(`Failed to fetch category products: ${res.status}`);
+  if (!res.ok) throw new Error(`fetchProductsByCategory failed: ${res.status}`);
   return res.json();
 }

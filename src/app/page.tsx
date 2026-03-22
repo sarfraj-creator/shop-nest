@@ -4,8 +4,10 @@ import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import { FiArrowRight, FiShield, FiTruck, FiRefreshCw } from "react-icons/fi";
 
-// Force dynamic so homepage always shows fresh products from the API
+// Pure SSR — no static generation, always fetch live from API on each request
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+export const fetchCache = "force-no-store";
 
 async function getFeaturedProducts() {
   try {
@@ -19,21 +21,9 @@ async function getFeaturedProducts() {
 }
 
 const perks = [
-  {
-    icon: FiTruck,
-    title: "Free Shipping",
-    desc: "On all orders over $50",
-  },
-  {
-    icon: FiShield,
-    title: "Secure Payments",
-    desc: "100% protected transactions",
-  },
-  {
-    icon: FiRefreshCw,
-    title: "Easy Returns",
-    desc: "30-day hassle-free returns",
-  },
+  { icon: FiTruck, title: "Free Shipping", desc: "On all orders over $50" },
+  { icon: FiShield, title: "Secure Payments", desc: "100% protected transactions" },
+  { icon: FiRefreshCw, title: "Easy Returns", desc: "30-day hassle-free returns" },
 ];
 
 export default async function HomePage() {
@@ -94,18 +84,12 @@ export default async function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">
-              Top Rated Products
-            </h2>
+            <h2 className="text-2xl font-bold text-slate-900">Top Rated Products</h2>
             <p className="mt-1 text-sm text-slate-500">
               Handpicked based on customer ratings
             </p>
           </div>
-          <Button
-            variant="ghost"
-            asChild
-            className="text-indigo-600 hover:text-indigo-700"
-          >
+          <Button variant="ghost" asChild className="text-indigo-600 hover:text-indigo-700">
             <Link href="/products">
               View all <FiArrowRight className="ml-1 h-4 w-4" />
             </Link>
@@ -119,9 +103,12 @@ export default async function HomePage() {
             ))}
           </div>
         ) : (
-          <div className="flex h-48 items-center justify-center rounded-xl border border-dashed border-slate-200">
-            <p className="text-sm text-slate-400">
-              Unable to load products. Please refresh the page.
+          <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 py-20 text-center">
+            <p className="text-sm font-medium text-slate-500">
+              Unable to load products right now.
+            </p>
+            <p className="text-xs text-slate-400">
+              Please refresh the page or try again in a moment.
             </p>
           </div>
         )}
