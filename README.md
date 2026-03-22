@@ -25,30 +25,9 @@ Open [http://localhost:3000](http://localhost:3000)
 
 > No `.env` file needed. Uses the free DummyJSON API — no API keys required.
 
----
-
-## Git Commands
-
-```bash
-git init
-git add .
-git commit -m "feat: initial shopnest ecommerce app"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/shopnest.git
-git push -u origin main
-```
 
 ---
 
-## Deploy to Vercel
-
-1. Push to GitHub (commands above)
-2. Go to [vercel.com/new](https://vercel.com/new) → Import repo
-3. Leave all settings as default
-4. **No environment variables needed**
-5. Click **Deploy**
-
----
 
 ## Tech Stack
 
