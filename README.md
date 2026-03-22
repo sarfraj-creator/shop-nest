@@ -4,13 +4,10 @@ A full-featured e-commerce web application built with Next.js 14, TypeScript, Ta
 
 ---
 
-## ⚡ Quick Start (Local)
+## Quick Start (Local)
 
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Run dev server
 npm run dev
 ```
 
@@ -18,37 +15,47 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🚀 Deploy to Vercel
+## Deploy to Vercel
 
 ### Step 1 — Push to GitHub
+
 ```bash
+# Inside the ecommerce-app folder:
+
 git init
 git add .
-git commit -m "initial commit"
+git commit -m "feat: initial shopnest ecommerce app"
+git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/shopnest.git
 git push -u origin main
 ```
 
-### Step 2 — Import on Vercel
-1. Go to [vercel.com/new](https://vercel.com/new)
-2. Import your GitHub repo
-3. Framework will auto-detect as **Next.js**
-4. Root Directory: `./` (leave as default)
-5. **No environment variables needed** — click Deploy ✓
+### Step 2 — Deploy on Vercel
 
-That's it. The app uses only the free public Fake Store API — no API keys required.
+1. Go to [vercel.com/new](https://vercel.com/new)
+2. Click **Import** next to your `shopnest` repo
+3. Leave all settings as default — Vercel auto-detects Next.js
+4. **No environment variables needed** — leave that section empty
+5. Click **Deploy**
 
 ---
 
-## 🔑 Environment Variables
+## Vercel Settings (leave all as default)
 
-**None required.** This project uses [Fake Store API](https://fakestoreapi.com) which is completely public and free.
-
-If you add a payment gateway later:
-| Variable | Description |
+| Setting | Value |
 |---|---|
-| `NEXT_PUBLIC_STRIPE_KEY` | Stripe publishable key (optional) |
-| `STRIPE_SECRET_KEY` | Stripe secret key (optional) |
+| Framework Preset | Next.js (auto-detected) |
+| Root Directory | `./` |
+| Build Command | `next build` (default) |
+| Output Directory | Next.js default |
+| Install Command | `npm install` (default) |
+| Environment Variables | **None required** |
+
+---
+
+## Environment Variables
+
+**None needed.** This project uses [Fake Store API](https://fakestoreapi.com) — completely free and public, no API key required.
 
 ---
 
@@ -56,28 +63,27 @@ If you add a payment gateway later:
 
 | Tool | Purpose |
 |---|---|
-| Next.js 14 (App Router) | Framework with SSG + ISR |
+| Next.js 14 (App Router) | Framework |
 | TypeScript | Type safety |
-| Tailwind CSS | Utility-first styling |
-| Zustand + persist | State with localStorage persistence |
+| Tailwind CSS | Styling |
+| Zustand + persist | Cart & Wishlist state (localStorage) |
 | react-hot-toast | Toast notifications |
 | react-icons | Icons |
-| Fake Store API | Product data source |
+| Fake Store API | Product data |
 
 ---
 
 ## Features
 
-| Feature | Details |
-|---|---|
-| Product Listing | Browse with category filter + live search |
-| Product Detail | Full info, ratings, SSG pre-built at deploy |
-| Shopping Cart | Add/remove/qty, free shipping >$50, persisted |
-| Wishlist | Toggle save, move to cart, persisted |
-| Checkout | Form validation, order summary |
-| Order Success | Confirmation page |
-| Error Handling | Loading skeletons, empty states, error boundaries |
-| Responsive | Mobile, tablet, desktop |
+- Product listing with category filter + search
+- Product detail page (SSG pre-built at deploy time)
+- Shopping cart — add, remove, update qty, free shipping over $50
+- Wishlist — toggle, move to cart
+- Checkout form with validation
+- Order success confirmation
+- Full localStorage persistence for cart and wishlist
+- Loading skeletons, error states, empty states, 404 page
+- Fully responsive (mobile, tablet, desktop)
 
 ---
 
@@ -85,60 +91,61 @@ If you add a payment gateway later:
 
 ```
 src/
-├── app/                        # Next.js App Router pages
+├── app/
 │   ├── layout.tsx
-│   ├── page.tsx                # Homepage
+│   ├── page.tsx                  # Homepage
 │   ├── not-found.tsx
 │   ├── products/
-│   │   ├── page.tsx            # Product listing (client — search/filter)
+│   │   ├── page.tsx              # Product listing
 │   │   ├── loading.tsx
 │   │   ├── error.tsx
 │   │   └── [id]/
-│   │       ├── page.tsx        # Product detail (SSG)
+│   │       ├── page.tsx          # Product detail (SSG)
 │   │       └── ProductActions.tsx
 │   ├── cart/page.tsx
 │   ├── wishlist/page.tsx
 │   ├── checkout/page.tsx
 │   └── order-success/page.tsx
 ├── components/
-│   ├── layout/                 # Navbar, Footer
-│   ├── product/                # ProductCard, ProductGrid, CategoryFilter
-│   ├── cart/                   # CartItemRow, CartSummary
-│   ├── checkout/               # CheckoutForm
-│   ├── wishlist/               # WishlistCard
-│   └── ui/                     # Button, Badge, Input, Label, Skeleton, StarRating
+│   ├── layout/                   # Navbar, Footer
+│   ├── product/                  # ProductCard, ProductGrid, CategoryFilter
+│   ├── cart/                     # CartItemRow, CartSummary
+│   ├── checkout/                 # CheckoutForm
+│   ├── wishlist/                 # WishlistCard
+│   └── ui/                       # Button, Badge, Input, Label, Skeleton, StarRating
 ├── hooks/
-│   └── useHydration.ts         # Prevents SSR/localStorage hydration mismatch
+│   └── useHydration.ts           # Fixes SSR/localStorage hydration mismatch
 ├── store/
-│   ├── cartStore.ts            # Zustand cart (persisted)
-│   └── wishlistStore.ts        # Zustand wishlist (persisted)
+│   ├── cartStore.ts              # Zustand cart (persisted to localStorage)
+│   └── wishlistStore.ts          # Zustand wishlist (persisted to localStorage)
 ├── lib/
-│   ├── api.ts                  # Fetch helpers
-│   └── utils.ts                # cn(), formatPrice(), truncate()
+│   ├── api.ts                    # Fake Store API fetch functions
+│   └── utils.ts                  # cn(), formatPrice(), truncate()
 └── types/index.ts
 ```
 
 ---
 
-## API Reference
+## API
 
 **Base URL:** `https://fakestoreapi.com`
 
 | Endpoint | Used For |
 |---|---|
-| `GET /products` | All products (homepage + listing) |
+| `GET /products` | All products |
 | `GET /products/:id` | Single product detail |
-| `GET /products/categories` | Category filter list |
-| `GET /products/category/:name` | Filter by category |
+| `GET /products/categories` | Category list for filter |
+| `GET /products/category/:name` | Products by category |
 
-No authentication. No rate limits for normal usage.
+No authentication or API key required.
 
 ---
 
-## Build
+## Scripts
 
 ```bash
-npm run build   # Production build
-npm start       # Start production server
-npm run lint    # ESLint check
+npm run dev      # Start development server
+npm run build    # Production build
+npm start        # Start production server
+npm run lint     # Run ESLint
 ```
