@@ -12,10 +12,18 @@ interface Props {
   params: { id: string };
 }
 
-// generates static pages at build time for all products
+// Tell Next.js to allow dynamic params not in the static list (SSR fallback)
+export const dynamicParams = true;
+
+// Pre-build all product pages at deploy time
 export async function generateStaticParams() {
-  const products = await fetchProducts();
-  return products.map((p) => ({ id: String(p.id) }));
+  try {
+    const products = await fetchProducts();
+    return products.map((p) => ({ id: String(p.id) }));
+  } catch {
+    // If API is down at build time, fall back to dynamic rendering
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: Props) {
@@ -31,26 +39,33 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function ProductDetailPage({ params }: Props) {
+  const id = Number(params.id);
+
+  // Validate id is actually a number before fetching
+  if (isNaN(id) || id <= 0) {
+    notFound();
+  }
+
   let product;
   try {
-    product = await fetchProduct(Number(params.id));
+    product = await fetchProduct(id);
   } catch {
     notFound();
   }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      {/* breadcrumb */}
+      {/* Breadcrumb */}
       <Link
         href="/products"
-        className="mb-8 inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-indigo-600 transition-colors"
+        className="mb-8 inline-flex items-center gap-1.5 text-sm text-slate-500 transition-colors hover:text-indigo-600"
       >
         <FiArrowLeft className="h-4 w-4" />
         Back to Products
       </Link>
 
       <div className="grid gap-10 lg:grid-cols-2">
-        {/* image */}
+        {/* Product image */}
         <div className="flex items-center justify-center rounded-2xl border border-slate-200 bg-white p-10">
           <Image
             src={product.image}
@@ -62,7 +77,7 @@ export default async function ProductDetailPage({ params }: Props) {
           />
         </div>
 
-        {/* info */}
+        {/* Product info */}
         <div className="flex flex-col">
           <Badge variant="secondary" className="mb-3 w-fit capitalize">
             {product.category}
@@ -79,7 +94,7 @@ export default async function ProductDetailPage({ params }: Props) {
               size="md"
             />
             <span className="text-sm text-slate-500">
-              {product.rating.rate}/5
+              {product.rating.rate} out of 5
             </span>
           </div>
 
@@ -87,12 +102,11 @@ export default async function ProductDetailPage({ params }: Props) {
             {product.description}
           </p>
 
-          {/* price */}
-          <div className="mb-6 flex items-baseline gap-2">
+          {/* Price */}
+          <div className="mb-6 flex items-baseline gap-3">
             <span className="text-3xl font-extrabold text-slate-900">
               {formatPrice(product.price)}
             </span>
-            {/* fake original price for visual — a real app would pull this from API */}
             <span className="text-sm text-slate-400 line-through">
               {formatPrice(product.price * 1.2)}
             </span>
@@ -101,15 +115,15 @@ export default async function ProductDetailPage({ params }: Props) {
             </Badge>
           </div>
 
-          {/* add to cart / wishlist buttons — client component */}
+          {/* Client-side add to cart / wishlist */}
           <ProductActions product={product} />
 
-          {/* small trust signals */}
+          {/* Trust signals */}
           <div className="mt-6 rounded-lg border border-slate-100 bg-slate-50 p-4">
             <ul className="space-y-1.5 text-sm text-slate-600">
               <li>✓ Free shipping on orders over $50</li>
-              <li>✓ 30-day easy returns</li>
-              <li>✓ Secure checkout</li>
+              <li>✓ 30-day hassle-free returns</li>
+              <li>✓ Secure, encrypted checkout</li>
             </ul>
           </div>
         </div>

@@ -4,77 +4,80 @@ A full-featured e-commerce web application built with Next.js 14, TypeScript, Ta
 
 ---
 
+## ⚡ Quick Start (Local)
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Run dev server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 🚀 Deploy to Vercel
+
+### Step 1 — Push to GitHub
+```bash
+git init
+git add .
+git commit -m "initial commit"
+git remote add origin https://github.com/YOUR_USERNAME/shopnest.git
+git push -u origin main
+```
+
+### Step 2 — Import on Vercel
+1. Go to [vercel.com/new](https://vercel.com/new)
+2. Import your GitHub repo
+3. Framework will auto-detect as **Next.js**
+4. Root Directory: `./` (leave as default)
+5. **No environment variables needed** — click Deploy ✓
+
+That's it. The app uses only the free public Fake Store API — no API keys required.
+
+---
+
+## 🔑 Environment Variables
+
+**None required.** This project uses [Fake Store API](https://fakestoreapi.com) which is completely public and free.
+
+If you add a payment gateway later:
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_STRIPE_KEY` | Stripe publishable key (optional) |
+| `STRIPE_SECRET_KEY` | Stripe secret key (optional) |
+
+---
+
 ## Tech Stack
 
 | Tool | Purpose |
 |---|---|
-| Next.js 14 (App Router) | Framework |
+| Next.js 14 (App Router) | Framework with SSG + ISR |
 | TypeScript | Type safety |
-| Tailwind CSS | Styling |
-| Zustand + persist | Cart & Wishlist state with localStorage |
+| Tailwind CSS | Utility-first styling |
+| Zustand + persist | State with localStorage persistence |
 | react-hot-toast | Toast notifications |
 | react-icons | Icons |
-| Fake Store API | Product data |
+| Fake Store API | Product data source |
 
 ---
 
 ## Features
 
-- **Product Listing** — Browse all products with category filter + live search
-- **Product Detail** — Full product info, ratings, add to cart & wishlist
-- **Shopping Cart** — Add/remove/update quantity, persisted in localStorage, subtotal + shipping + total
-- **Wishlist** — Save products, move to cart, persisted in localStorage
-- **Checkout** — Form with validation (name, email, address), order summary sidebar
-- **Order Success** — Confirmation page after placing order
-- Loading skeletons, error states, empty states, 404 page
-- Fully responsive — mobile, tablet, desktop
-- Free shipping progress bar (free over $50)
-
----
-
-## Getting Started
-
-### 1. Clone / unzip the project
-
-```bash
-cd shopnest
-```
-
-### 2. Install dependencies
-
-```bash
-npm install
-```
-
-### 3. Run the development server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 4. Build for production
-
-```bash
-npm run build
-npm start
-```
-
----
-
-## API
-
-This app uses the **[Fake Store API](https://fakestoreapi.com)** — a free, open REST API for e-commerce prototypes.
-
-| Endpoint | Usage |
+| Feature | Details |
 |---|---|
-| `GET /products` | Fetch all products |
-| `GET /products/:id` | Fetch single product |
-| `GET /products/categories` | Fetch all categories |
-| `GET /products/category/:name` | Fetch products by category |
-
-No API key required.
+| Product Listing | Browse with category filter + live search |
+| Product Detail | Full info, ratings, SSG pre-built at deploy |
+| Shopping Cart | Add/remove/qty, free shipping >$50, persisted |
+| Wishlist | Toggle save, move to cart, persisted |
+| Checkout | Form validation, order summary |
+| Order Success | Confirmation page |
+| Error Handling | Loading skeletons, empty states, error boundaries |
+| Responsive | Mobile, tablet, desktop |
 
 ---
 
@@ -83,74 +86,59 @@ No API key required.
 ```
 src/
 ├── app/                        # Next.js App Router pages
-│   ├── layout.tsx              # Root layout (Navbar, Footer, Toaster)
+│   ├── layout.tsx
 │   ├── page.tsx                # Homepage
-│   ├── not-found.tsx           # 404 page
+│   ├── not-found.tsx
 │   ├── products/
-│   │   ├── page.tsx            # Product listing with search + filter
-│   │   ├── loading.tsx         # Skeleton loading UI
-│   │   ├── error.tsx           # Error boundary
+│   │   ├── page.tsx            # Product listing (client — search/filter)
+│   │   ├── loading.tsx
+│   │   ├── error.tsx
 │   │   └── [id]/
 │   │       ├── page.tsx        # Product detail (SSG)
-│   │       └── ProductActions.tsx  # Client: add to cart / wishlist
-│   ├── cart/
-│   │   └── page.tsx            # Cart page
-│   ├── wishlist/
-│   │   └── page.tsx            # Wishlist page
-│   ├── checkout/
-│   │   └── page.tsx            # Checkout page
-│   └── order-success/
-│       └── page.tsx            # Order confirmation
-│
+│   │       └── ProductActions.tsx
+│   ├── cart/page.tsx
+│   ├── wishlist/page.tsx
+│   ├── checkout/page.tsx
+│   └── order-success/page.tsx
 ├── components/
-│   ├── layout/
-│   │   ├── Navbar.tsx          # Sticky navbar with cart/wishlist badge
-│   │   └── Footer.tsx
-│   ├── product/
-│   │   ├── ProductCard.tsx     # Product card with wishlist + add to cart
-│   │   ├── ProductGrid.tsx     # Grid wrapper with skeleton/empty states
-│   │   └── CategoryFilter.tsx  # Category pill filter buttons
-│   ├── cart/
-│   │   ├── CartItemRow.tsx     # Cart row with qty controls + remove
-│   │   └── CartSummary.tsx     # Order summary (reused in cart + checkout)
-│   ├── checkout/
-│   │   └── CheckoutForm.tsx    # Checkout form with validation
-│   ├── wishlist/
-│   │   └── WishlistCard.tsx    # Wishlist item card
-│   └── ui/                     # Base UI components (shadcn-style)
-│       ├── button.tsx
-│       ├── badge.tsx
-│       ├── input.tsx
-│       ├── label.tsx
-│       ├── skeleton.tsx
-│       └── star-rating.tsx
-│
+│   ├── layout/                 # Navbar, Footer
+│   ├── product/                # ProductCard, ProductGrid, CategoryFilter
+│   ├── cart/                   # CartItemRow, CartSummary
+│   ├── checkout/               # CheckoutForm
+│   ├── wishlist/               # WishlistCard
+│   └── ui/                     # Button, Badge, Input, Label, Skeleton, StarRating
+├── hooks/
+│   └── useHydration.ts         # Prevents SSR/localStorage hydration mismatch
 ├── store/
-│   ├── cartStore.ts            # Zustand cart store (localStorage persisted)
-│   └── wishlistStore.ts        # Zustand wishlist store (localStorage persisted)
-│
+│   ├── cartStore.ts            # Zustand cart (persisted)
+│   └── wishlistStore.ts        # Zustand wishlist (persisted)
 ├── lib/
-│   ├── api.ts                  # All API fetch functions
+│   ├── api.ts                  # Fetch helpers
 │   └── utils.ts                # cn(), formatPrice(), truncate()
-│
-└── types/
-    └── index.ts                # TypeScript interfaces
+└── types/index.ts
 ```
 
 ---
 
-## Deploy on Vercel
+## API Reference
 
-The easiest way to deploy is via [Vercel](https://vercel.com):
+**Base URL:** `https://fakestoreapi.com`
 
-1. Push your code to a GitHub repo
-2. Import the repo on Vercel
-3. Click Deploy — no environment variables needed
+| Endpoint | Used For |
+|---|---|
+| `GET /products` | All products (homepage + listing) |
+| `GET /products/:id` | Single product detail |
+| `GET /products/categories` | Category filter list |
+| `GET /products/category/:name` | Filter by category |
+
+No authentication. No rate limits for normal usage.
 
 ---
 
-## Notes
+## Build
 
-- Cart and wishlist data persists in the browser's localStorage automatically
-- Product pages are statically generated at build time (`generateStaticParams`)
-- Free shipping applies automatically on orders over $50
+```bash
+npm run build   # Production build
+npm start       # Start production server
+npm run lint    # ESLint check
+```

@@ -12,7 +12,7 @@ export default function OrderSuccessPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Order Placed!</h1>
         <p className="mt-2 text-sm text-slate-500">
-          Thanks for your purchase. We've received your order and will start
+          Thanks for your purchase. We&apos;ve received your order and will start
           processing it shortly. A confirmation will be sent to your email.
         </p>
       </div>

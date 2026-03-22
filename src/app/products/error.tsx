@@ -22,7 +22,7 @@ export default function Error({ error, reset }: ErrorProps) {
         Something went wrong
       </h2>
       <p className="text-sm text-slate-500">
-        We couldn't load the products. This might be a temporary issue.
+        We couldn&apos;t load the products. This might be a temporary issue.
       </p>
       <Button onClick={reset} size="lg">
         Try Again

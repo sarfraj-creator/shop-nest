@@ -47,7 +47,7 @@ export default function CartPage() {
           Your cart is empty
         </h2>
         <p className="text-sm text-slate-500">
-          Looks like you haven't added anything yet. Start exploring our
+          Looks like you haven&apos;t added anything yet. Start exploring our
           products!
         </p>
         <Button asChild size="lg" className="mt-2">

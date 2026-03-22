@@ -55,7 +55,7 @@ export default function WishlistPage() {
           </span>
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          Items you've saved for later
+          Items you&apos;ve saved for later
         </p>
       </div>
 

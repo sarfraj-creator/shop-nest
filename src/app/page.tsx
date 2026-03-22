@@ -4,12 +4,15 @@ import { ProductCard } from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import { FiArrowRight, FiShield, FiTruck, FiRefreshCw } from "react-icons/fi";
 
-// We show the 8 highest rated products on the homepage
 async function getFeaturedProducts() {
-  const products = await fetchProducts();
-  return [...products]
-    .sort((a, b) => b.rating.rate - a.rating.rate)
-    .slice(0, 8);
+  try {
+    const products = await fetchProducts();
+    return [...products]
+      .sort((a, b) => b.rating.rate - a.rating.rate)
+      .slice(0, 8);
+  } catch {
+    return [];
+  }
 }
 
 const perks = [
@@ -48,7 +51,7 @@ export default async function HomePage() {
             </h1>
             <p className="mb-8 text-lg text-slate-500">
               Discover thousands of products across all categories. Quality you
-              can trust, prices you'll love.
+              can trust, prices you&apos;ll love.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Button asChild size="lg">
@@ -58,7 +61,7 @@ export default async function HomePage() {
                 </Link>
               </Button>
               <Button variant="outline" asChild size="lg">
-                <Link href="/products?category=electronics">Shop Electronics</Link>
+                <Link href="/products">Shop Electronics</Link>
               </Button>
             </div>
           </div>
@@ -88,29 +91,44 @@ export default async function HomePage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Top Rated Products</h2>
+            <h2 className="text-2xl font-bold text-slate-900">
+              Top Rated Products
+            </h2>
             <p className="mt-1 text-sm text-slate-500">
               Handpicked based on customer ratings
             </p>
           </div>
-          <Button variant="ghost" asChild className="text-indigo-600 hover:text-indigo-700">
+          <Button
+            variant="ghost"
+            asChild
+            className="text-indigo-600 hover:text-indigo-700"
+          >
             <Link href="/products">
               View all <FiArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
         </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {featured.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+
+        {featured.length > 0 ? (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {featured.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex h-48 items-center justify-center rounded-xl border border-dashed border-slate-200">
+            <p className="text-sm text-slate-400">
+              Products could not be loaded. Please try again later.
+            </p>
+          </div>
+        )}
       </section>
 
       {/* CTA banner */}
       <section className="bg-indigo-600">
         <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl font-bold text-white sm:text-3xl">
-            Ready to find something you'll love?
+            Ready to find something you&apos;ll love?
           </h2>
           <p className="mt-3 text-indigo-200">
             Explore our full catalogue and find your next favourite item.
