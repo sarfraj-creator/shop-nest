@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { FiMapPin, FiClock, FiUsers } from "react-icons/fi";
 
 /**
@@ -34,7 +35,7 @@ export default function EventCard({ event }: { event: any }) {
       {/* Thumbnail */}
       <div className="relative h-44 flex-shrink-0 bg-gray-100">
         {event.thumbnail ? (
-          <img
+          <Image
             src={event.thumbnail}
             alt={event.title}
             className="h-full w-full object-cover"
