@@ -22,12 +22,9 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans flex flex-col min-h-screen`}>
         <Navbar />
         {/*
-          FIX: The original `min-h-[calc(100vh-64px)]` forced <main> to be at
-          least viewport-height on every page — including short pages like the
-          events list — which pushed the footer far off-screen with empty space.
-
-          Using `flex-1` instead lets <main> grow only as tall as its content
-          needs, with the footer sitting naturally right below it.
+          FIX: Original had min-h-[calc(100vh-64px)] which forced <main> to be
+          full viewport height on every page — pushing the footer way down on
+          short content pages. flex-1 lets it grow only as tall as needed.
         */}
         <main className="flex-1">{children}</main>
         <Footer />

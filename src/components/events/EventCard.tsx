@@ -40,6 +40,8 @@ export default function EventCard({ event }: { event: any }) {
             alt={event.title}
             className="h-full w-full object-cover"
             loading="lazy"
+            width={100}
+    height={100}
           />
         ) : (
           <div className="h-full w-full flex items-center justify-center text-gray-300">

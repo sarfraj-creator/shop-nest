@@ -1,12 +1,16 @@
 /**
  * app/events/page.tsx  — Server Component
  *
- * Fix: footer excess space was caused by `min-h-[calc(100vh-64px)]` on
- * the root <main> in layout.tsx pushing the footer to the bottom even on
- * short pages. The events page now fills available height naturally.
+ * CRITICAL: `export const dynamic = "force-dynamic"` is REQUIRED.
  *
- * Pagination preserves all active filter params — page links never lose filters.
+ * Without it, Next.js 14 attempts to statically prerender this page at
+ * build time. But `searchParams` (filter/pagination state) only exists at
+ * request time — so the build crashes with a prerender error on Vercel.
+ *
+ * force-dynamic opts this page into SSR on every request, which is correct
+ * because the page content changes based on URL filter params.
  */
+export const dynamic = "force-dynamic";
 
 import { getEvents } from "@/lib/eventApi";
 import EventList from "@/components/events/EventList";
@@ -15,7 +19,7 @@ import MobileFilters from "@/components/filters/MobileFilters";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Swap only the `page` value; preserve every other filter param. */
+/** Swap only `page`; carry every other active filter param forward. */
 function pageURL(params: Record<string, string>, page: number): string {
   const p = new URLSearchParams(
     Object.fromEntries(
@@ -54,32 +58,31 @@ function Pagination({
   const pages = pageRange(current, total);
 
   const base =
-    "min-w-[36px] h-9 flex items-center justify-center rounded-lg border text-sm font-medium transition-colors";
-  const active = "bg-black text-white border-black";
-  const inactive = "border-gray-200 text-gray-700 hover:bg-gray-50";
-  const disabled = "border-gray-100 text-gray-300 cursor-not-allowed";
+    "min-w-[36px] h-9 flex items-center justify-center rounded-lg border text-sm font-medium transition-colors px-3";
 
   return (
     <nav aria-label="Pagination" className="flex items-center justify-center gap-1 mt-8 flex-wrap">
       {current > 1 ? (
-        <a href={pageURL(params, current - 1)} className={`${base} ${inactive} px-3`}>
+        <a href={pageURL(params, current - 1)} className={`${base} border-gray-200 text-gray-700 hover:bg-gray-50`}>
           ← Prev
         </a>
       ) : (
-        <span className={`${base} ${disabled} px-3`}>← Prev</span>
+        <span className={`${base} border-gray-100 text-gray-300 cursor-not-allowed`}>← Prev</span>
       )}
 
       {pages.map((p, i) =>
         p === null ? (
-          <span key={`e-${i}`} className="h-9 flex items-center px-1 text-gray-400 text-sm">
-            …
-          </span>
+          <span key={`e-${i}`} className="h-9 flex items-center px-1 text-gray-400 text-sm">…</span>
         ) : (
           <a
             key={p}
             href={pageURL(params, p)}
             aria-current={p === current ? "page" : undefined}
-            className={`${base} px-3 ${p === current ? active : inactive}`}
+            className={`${base} ${
+              p === current
+                ? "bg-black text-white border-black"
+                : "border-gray-200 text-gray-700 hover:bg-gray-50"
+            }`}
           >
             {p}
           </a>
@@ -87,11 +90,11 @@ function Pagination({
       )}
 
       {current < total ? (
-        <a href={pageURL(params, current + 1)} className={`${base} ${inactive} px-3`}>
+        <a href={pageURL(params, current + 1)} className={`${base} border-gray-200 text-gray-700 hover:bg-gray-50`}>
           Next →
         </a>
       ) : (
-        <span className={`${base} ${disabled} px-3`}>Next →</span>
+        <span className={`${base} border-gray-100 text-gray-300 cursor-not-allowed`}>Next →</span>
       )}
     </nav>
   );
@@ -117,26 +120,21 @@ export default async function EventsPage({
         {/* Main */}
         <div className="flex-1 min-w-0">
           {/* Top bar */}
-          <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
-            <div className="flex items-center gap-3 flex-wrap">
-              {/* Mobile filter trigger */}
-              <div className="md:hidden">
-                <MobileFilters />
-              </div>
-              <h1 className="text-xl font-bold text-gray-900">Events</h1>
-              {meta && meta.total > 0 && (
-                <span className="text-sm text-gray-500">
-                  {meta.from}–{meta.to} of{" "}
-                  <span className="font-medium text-gray-700">{meta.total}</span>
-                </span>
-              )}
+          <div className="flex items-center gap-3 mb-5 flex-wrap">
+            <div className="md:hidden">
+              <MobileFilters />
             </div>
+            <h1 className="text-xl font-bold text-gray-900">Events</h1>
+            {meta && meta.total > 0 && (
+              <span className="text-sm text-gray-500">
+                {meta.from}–{meta.to} of{" "}
+                <span className="font-medium text-gray-700">{meta.total}</span>
+              </span>
+            )}
           </div>
 
-          {/* Grid */}
           <EventList events={events} error={error} />
 
-          {/* Pagination */}
           {meta && (
             <Pagination
               current={meta.current_page}
