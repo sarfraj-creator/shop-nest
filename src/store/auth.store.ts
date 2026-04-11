@@ -8,11 +8,7 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  token:
-    typeof window !== "undefined"
-      ? localStorage.getItem("token")
-      : null,
-
+  token: null,
   user: null,
 
   setAuth: (token, user) => {
