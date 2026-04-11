@@ -18,20 +18,17 @@ const navLinks = [
 
 export function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-
   const hydrated = useHydration();
+  const router = useRouter();
 
-  // ✅ Zustand stores
+  const { token } = useAuthStore();
+
   const cartCount = useCartStore(selectCartItemCount);
   const wishCount = useWishlistStore((s) => s.items.length);
-  const { token, logout } = useAuthStore();
 
-  // ✅ Prevent hydration mismatch
   const showCartBadge = hydrated && cartCount > 0;
   const showWishBadge = hydrated && wishCount > 0;
-  const isLoggedIn = hydrated && !!token;
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-sm">
@@ -61,17 +58,18 @@ export function Navbar() {
           ))}
         </nav>
 
-        {/* Right side */}
-        <div className="flex items-center gap-2">
+        {/* Right side icons */}
+        <div className="flex items-center gap-1">
 
           {/* Wishlist */}
           <Link
             href="/wishlist"
-            className="relative flex h-10 w-10 items-center justify-center rounded-lg hover:bg-slate-100"
+            aria-label="Wishlist"
+            className="relative flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-slate-100"
           >
             <FiHeart className="h-5 w-5 text-slate-700" />
             {showWishBadge && (
-              <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] text-white">
+              <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold leading-none text-white">
                 {wishCount}
               </span>
             )}
@@ -80,55 +78,62 @@ export function Navbar() {
           {/* Cart */}
           <Link
             href="/cart"
-            className="relative flex h-10 w-10 items-center justify-center rounded-lg hover:bg-slate-100"
+            aria-label="Cart"
+            className="relative flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-slate-100"
           >
             <FiShoppingCart className="h-5 w-5 text-slate-700" />
             {showCartBadge && (
-              <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] text-white">
+              <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold leading-none text-white">
                 {cartCount > 9 ? "9+" : cartCount}
               </span>
             )}
           </Link>
 
-          {/* ✅ Auth Button (FIXED) */}
-          {hydrated && (
-            !isLoggedIn ? (
-              <button
-                onClick={() => router.push("/login")}
-                className="ml-2 rounded bg-black px-3 py-1 text-sm text-white"
-              >
-                Login
-              </button>
-            ) : (
-              <button
-                onClick={logout}
-                className="ml-2 rounded bg-gray-800 px-3 py-1 text-sm text-white"
-              >
-                Logout
-              </button>
-            )
+       
+          {!token ? (
+            <button
+              onClick={() => router.push("/login")}
+              className="ml-2 rounded bg-black px-3 py-1 text-sm text-white"
+            >
+              Login
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                localStorage.removeItem("token");
+                router.push("/login");
+              }}
+              className="ml-2 rounded bg-gray-800 px-3 py-1 text-sm text-white"
+            >
+              Logout
+            </button>
           )}
 
-          {/* Mobile menu */}
+          {/* Mobile hamburger */}
           <button
-            className="ml-1 flex h-10 w-10 items-center justify-center rounded-lg hover:bg-slate-100 md:hidden"
+            className="ml-1 flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-slate-100 md:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
           >
-            {mobileOpen ? <FiX /> : <FiMenu />}
+            {mobileOpen ? (
+              <FiX className="h-5 w-5" />
+            ) : (
+              <FiMenu className="h-5 w-5" />
+            )}
           </button>
         </div>
       </div>
 
-      {/* Mobile nav */}
+      {/* Mobile nav dropdown */}
       {mobileOpen && (
-        <div className="border-t bg-white px-4 pb-4 pt-2 md:hidden">
+        <div className="border-t border-slate-200 bg-white px-4 pb-4 pt-2 md:hidden">
           {navLinks.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                "block py-2 text-sm",
+                "block py-2.5 text-sm font-medium transition-colors hover:text-indigo-600",
                 pathname === l.href ? "text-indigo-600" : "text-slate-700"
               )}
             >
