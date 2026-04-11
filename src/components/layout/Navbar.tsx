@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FiShoppingCart, FiHeart, FiMenu, FiX } from "react-icons/fi";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { useState } from "react";
@@ -9,6 +9,7 @@ import { useCartStore, selectCartItemCount } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useHydration } from "@/hooks/useHydration";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth.store";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -19,17 +20,20 @@ export function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const hydrated = useHydration();
+  const router = useRouter();
+
+  const { token } = useAuthStore();
 
   const cartCount = useCartStore(selectCartItemCount);
   const wishCount = useWishlistStore((s) => s.items.length);
 
-  // Before hydration, don't render badges — they'd mismatch SSR (which sees 0)
   const showCartBadge = hydrated && cartCount > 0;
   const showWishBadge = hydrated && wishCount > 0;
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <HiOutlineShoppingBag className="h-7 w-7 text-indigo-600" />
@@ -56,6 +60,7 @@ export function Navbar() {
 
         {/* Right side icons */}
         <div className="flex items-center gap-1">
+
           {/* Wishlist */}
           <Link
             href="/wishlist"
@@ -83,6 +88,26 @@ export function Navbar() {
               </span>
             )}
           </Link>
+
+       
+          {!token ? (
+            <button
+              onClick={() => router.push("/login")}
+              className="ml-2 rounded bg-black px-3 py-1 text-sm text-white"
+            >
+              Login
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                localStorage.removeItem("token");
+                router.push("/login");
+              }}
+              className="ml-2 rounded bg-gray-800 px-3 py-1 text-sm text-white"
+            >
+              Logout
+            </button>
+          )}
 
           {/* Mobile hamburger */}
           <button

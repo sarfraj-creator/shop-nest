@@ -86,3 +86,34 @@ export async function fetchProductsByCategory(
   const data: DummyProductsResponse = await res.json();
   return data.products.map(normalise);
 }
+
+
+
+export const API_BASE_URL =
+  "https://staging-backend.thebobproject.co/api";
+
+export const apiFetch = async (
+  endpoint: string,
+  options: RequestInit = {}
+) => {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && {
+        Authorization: `Bearer ${token}`,
+      }),
+      ...options.headers,
+    },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw data;
+  }
+
+  return data;
+};
